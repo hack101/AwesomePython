@@ -159,14 +159,14 @@ Find the sum of all the multiples of 3 or 5 below 1000. -- Try to do this in one
 sum([ x for x in range(1,1001) if not (x%3 and x%5) ])
 --->
 
-2. [Here]() is a list of some random words. 
+2. [Here](https://github.com/hack101/AwesomePython/blob/master/words.txt) is a list of some random words. 
 Take this list (you can copy and paste it) and create a new list using dictionary comprehension which only has words that start with a vowel. 
 
 <!---
 [ word for word in random_words if word[0] in ['a','e','i','o','u'] ]
 --->
 
-*Note:* This list of words was created using a list comprehension! Click [here]() if you are interested in seeing how.
+*Note:* This list of words was created using a list comprehension! Click [here](https://github.com/hack101/AwesomePython/blob/master/words.py) if you are interested in seeing how.
 
 3. (FizzBuzz) Write a program that prints the numbers from 1 to 100. But for multiples of three print “Fizz” instead of the number and for the multiples of five print “Buzz”. For numbers which are multiples of both three and five print “FizzBuzz”. -- Try to do this in one line. You will need to use [join](http://www.tutorialspoint.com/python/string_join.htm).
 
@@ -174,8 +174,9 @@ Take this list (you can copy and paste it) and create a new list using dictionar
 print "\n".join([ "FizzBuzz" if not i%3 and not i%5 else "Fizz" if not i%3 else "Buzz" if not i%5 else str(i) for i in range(1,21) ])
 --->
 
+### 2. Lambda Expressions
 
- 
+
 
 
 

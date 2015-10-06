@@ -154,31 +154,15 @@ Now that we know about list comprehensions, let's do a couple challenges! They g
 1. (Project Euler #1): If we list all the natural numbers below 10 that are multiples of 3 or 5, we get 3, 5, 6 and 9. The sum of these multiples is 23.
 Find the sum of all the multiples of 3 or 5 below 1000. -- Try to do this in one line. You may need to use Python's `sum` function, which works like so:
 `sum([1,2,3]) -> 6` 
-
-<!---
-sum([ x for x in range(1,1001) if not (x%3 and x%5) ])
---->
-
+[]( sum([ x for x in range(1,1001) if not (x%3 and x%5) ]) )
 2. [Here](https://github.com/hack101/AwesomePython/blob/master/words.txt) is a list of some random words. 
 Take this list (you can copy and paste it) and create a new list using dictionary comprehension which only has words that start with a vowel. 
-
-<!---
-[ word for word in random_words if word[0] in ['a','e','i','o','u'] ]
---->
-
+[]( [ word for word in random_words if word[0] in ['a','e','i','o','u'] ] )
 *Note:* This list of words was created using a list comprehension! Click [here](https://github.com/hack101/AwesomePython/blob/master/words.py) if you are interested in seeing how.
-
 3. Try using list comprehension to flatten a list. For example, if `l=[ [1,2], [3,4], [5,6] ]`, we want to turn it into `[ 1, 2, 3, 4, 5, 6]`.
-
-<!--
-[ x for sl in l for x in sl ]
---> 
-
+[]( [ x for sl in l for x in sl ] )
 4. (FizzBuzz) Write a program that prints the numbers from 1 to 100. But for multiples of three print “Fizz” instead of the number and for the multiples of five print “Buzz”. For numbers which are multiples of both three and five print “FizzBuzz”. -- Try to do this in one line. You will need to use [join](http://www.tutorialspoint.com/python/string_join.htm).
-
-<!---
-print "\n".join([ "FizzBuzz" if not i%3 and not i%5 else "Fizz" if not i%3 else "Buzz" if not i%5 else str(i) for i in range(1,21) ])
---->
+[]( print "\n".join([ "FizzBuzz" if not i%3 and not i%5 else "Fizz" if not i%3 else "Buzz" if not i%5 else str(i) for i in range(1,21) ]) )
 
 ### 2. Lambda Expressions
 
@@ -232,20 +216,14 @@ print list # this prints [10, 6, 5, 3, 2, 1]
 ##### Challenges
 
 1. Take the list of words [here](https://github.com/hack101/AwesomePython/blob/master/words.txt) and sort them by their third letter.
-
-<!--
-words.sort(key=lambda x: x[2])
--->
+[]( words.sort(key=lambda x: x[2]) )
 
 2. (This one is a little difficult!) Try writing a method to sort a list using [quicksort](http://me.dt.in.th/page/Quicksort/) in only 1 line. 
 You will need both list comprehension as well as lambda expressions. Hint: recursion is fine in lambda expressions. 
 So `fib = lambda n: 1 if n == 1 else n * fib(n-1)`.
+[]( q = lambda l: l if not l else q([ x for x in l if x < l[0]]) + l[:1] + q([ x for x in l if x > l[0]]) )
 
-<!--
-q = lambda l: l if not l else q([ x for x in l if x < l[0]]) + l[:1] + q([ x for x in l if x > l[0]])
--->
-
-### Built-in Functions
+### 3. Built-in Functions
 
 Built-in functions are exactly that, functions that are built into python. For a full list see [here](https://docs.python.org/2/library/functions.html).
 
@@ -295,37 +273,14 @@ We basically just recreated the sum function!
 ##### Challenges:
 
 1. Use `len` and `filter` to figure out how many of the words in [this list](https://github.com/hack101/AwesomePython/blob/master/words.txt) have an even number of letters.
-
-<!---
-len(filter(lambda x: len(x)%2 == 0, words))
---->
-
+[]( len(filter(lambda x: len(x)%2 == 0, words)) )
 2. Use `map` to turn [this](https://github.com/hack101/AwesomePython/blob/master/int_strings.txt) list of strings into their integer values + 2.
-
-
-<!---
-map(lambda x: int(x)+2, list)
---->
-
+[]( map(lambda x: int(x)+2, list) )
 3. Find the second smallest in [this](https://github.com/hack101/AwesomePython/blob/master/numbers.txt) list of integers. (Do not sort!)
-
-<!---
-min(filter(lambda x: x!=min(list), list))
---->
-
+[]( min(filter(lambda x: x!=min(list), list)) )
 4. Use reduce to find the maximum of [this](https://github.com/hack101/AwesomePython/blob/master/numbers.txt) list of integers. (Do not use `max` or sort!!!)
-
-<!---
-reduce(lambda x, y: x if x > y else y, list)
--->
-
+[]( reduce(lambda x, y: x if x > y else y, list) )
 5. Try doing number 3 without the `min` function.
-
-<!---
-reduce(lambda x,y: x if x<y else y, filter(lambda x: x!=reduce(lambda x,y: x if x<y else y, list), list))
---->
-
-
-
+[]( reduce(lambda x,y: x if x<y else y, filter(lambda x: x!=reduce(lambda x,y: x if x<y else y, list), list)) )
 
 

@@ -127,26 +127,55 @@ file = open("numbers.csv","rt")
 ```
 
 Now, we want to turn this into a dictionary, where each name is used as a key to find each phone number (which is an integer).
-We do that in the same way as we did list comprehensions
+We do that in the same way as we did list comprehensions:
+`{ <expression in the form 'key: value'> for <value> in <iterable> }`. 
 
-```
+```python
 file = open("numbers.csv","rt")
 dictionary = { line[0]: int(line[1]) for line in [ line.strip().split(',') for line in file ] }
+file.close()
 ```
 
+Here, the interable in our comprehension is another comprehension! We can also have a filter, like in list comprehensions.
+
+```python
+file = open("numbers.csv","rt")
+# I really don't like Dave...
+dictionary = { line[0]: int(line[1]) for line in [ line.strip().split(',') for line in file ] if line[0] != "Dave" }
+file.close()
+```
+
+If you're interested in going beyond the tutorial, this would be a good place to learn about [context managers](https://docs.python.org/2/reference/compound_stmts.html#the-with-statement)!
+
+###### Challenges
+
+Now that we know about list comprehensions, let's do a couple challenges! They get harder as you go down the list. Try one out now!
+
+1. (Project Euler #1): If we list all the natural numbers below 10 that are multiples of 3 or 5, we get 3, 5, 6 and 9. The sum of these multiples is 23.
+Find the sum of all the multiples of 3 or 5 below 1000. -- Try to do this in one line. You may need to use Python's `sum` function, which works like so:
+`sum([1,2,3]) -> 6` 
+
+<!---
+sum([ x for x in range(1,1001) if not (x%3 and x%5) ])
+--->
+
+2. [Here]() is a list of some random words. 
+Take this list (you can copy and paste it) and create a new list using dictionary comprehension which only has words that start with a vowel. 
+
+<!---
+[ word for word in random_words if word[0] in ['a','e','i','o','u'] ]
+--->
+
+*Note:* This list of words was created using a list comprehension! Click [here]() if you are interested in seeing how.
+
+3. (FizzBuzz) Write a program that prints the numbers from 1 to 100. But for multiples of three print “Fizz” instead of the number and for the multiples of five print “Buzz”. For numbers which are multiples of both three and five print “FizzBuzz”. -- Try to do this in one line. You will need to use [join](http://www.tutorialspoint.com/python/string_join.htm).
+
+<!---
+print "\n".join([ "FizzBuzz" if not i%3 and not i%5 else "Fizz" if not i%3 else "Buzz" if not i%5 else str(i) for i in range(1,21) ])
+--->
 
 
-
-
-
-
-
-
-
-
-
-
-
+ 
 
 
 

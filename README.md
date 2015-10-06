@@ -52,7 +52,7 @@ for link in BeautifulSoup(response, parseOnlyThese=SoupStrainer('a')):
 [Source](http://stackoverflow.com/questions/1080411/retrieve-links-from-web-page-using-python-and-beautifulsoup)
 
 
-We'll see later how we can actually do this in a prettier and shorter way!
+We'll learn about list comprehension which actually lets you do this in a prettier and shorter way!
 
 
 One other great thing about python is that it has an interactive mode, which is great for developement. 
@@ -168,13 +168,162 @@ Take this list (you can copy and paste it) and create a new list using dictionar
 
 *Note:* This list of words was created using a list comprehension! Click [here](https://github.com/hack101/AwesomePython/blob/master/words.py) if you are interested in seeing how.
 
-3. (FizzBuzz) Write a program that prints the numbers from 1 to 100. But for multiples of three print “Fizz” instead of the number and for the multiples of five print “Buzz”. For numbers which are multiples of both three and five print “FizzBuzz”. -- Try to do this in one line. You will need to use [join](http://www.tutorialspoint.com/python/string_join.htm).
+3. Try using list comprehension to flatten a list. For example, if `l=[ [1,2], [3,4], [5,6] ]`, we want to turn it into `[ 1, 2, 3, 4, 5, 6]`.
+
+<!--
+[ x for sl in l for x in sl ]
+--> 
+
+4. (FizzBuzz) Write a program that prints the numbers from 1 to 100. But for multiples of three print “Fizz” instead of the number and for the multiples of five print “Buzz”. For numbers which are multiples of both three and five print “FizzBuzz”. -- Try to do this in one line. You will need to use [join](http://www.tutorialspoint.com/python/string_join.htm).
 
 <!---
 print "\n".join([ "FizzBuzz" if not i%3 and not i%5 else "Fizz" if not i%3 else "Buzz" if not i%5 else str(i) for i in range(1,21) ])
 --->
 
 ### 2. Lambda Expressions
+
+In python, functions are variables. 
+Sometimes we want to use them without defining them first, and sometimes we want to define them without a full `def` statement. 
+Lambda expressions are how we do that. 
+
+They have the following syntax:
+
+```python
+lambda <arguments>: <what to return from arguemnts>
+```
+
+For example, the function `lambda x: x+2` is equivalent to 
+```python
+def function(x):
+    return x+2
+```
+
+And `val` has the same value in both of these cases:
+
+```python
+val = (lambda x: x+2)(5)
+
+def function(x):
+    return x+2
+
+val = function(5)
+```
+
+"This is cool", you may be thinking, "but why?". 
+One of the primary uses of lambda expressions is that we can use functions as arguments without defining them. 
+
+For example, when sorting a list, you may not want to use the standard sorting built in to python.
+The list sort method take a keyword argument `key`. 
+The value of `key` should be a function that tells the sorting method what to sort by.
+
+Maybe you want to do a reverse sort of a list.
+
+```python
+list = [ 3, 5, 2, 6, 10, 1 ]
+list.sort()
+print list # this prints [1, 2, 3, 5, 6, 10]
+
+# Now let's use key to do a reverse sort.
+# We tell sort that it should sort each element by its negative value
+list.sort(key=lambda x: -x)
+print list # this prints [10, 6, 5, 3, 2, 1]
+```
+
+##### Challenges
+
+1. Take the list of words [here](https://github.com/hack101/AwesomePython/blob/master/words.txt) and sort them by their third letter.
+
+<!--
+words.sort(key=lambda x: x[2])
+-->
+
+2. (This one is a little difficult!) Try writing a method to sort a list using [quicksort](http://me.dt.in.th/page/Quicksort/) in only 1 line. 
+You will need both list comprehension as well as lambda expressions. Hint: recursion is fine in lambda expressions. 
+So `fib = lambda n: 1 if n == 1 else n * fib(n-1)`.
+
+<!--
+q = lambda l: l if not l else q([ x for x in l if x < l[0]]) + l[:1] + q([ x for x in l if x > l[0]])
+-->
+
+### Built-in Functions
+
+Built-in functions are exactly that, functions that are built into python. For a full list see [here](https://docs.python.org/2/library/functions.html).
+
+This list includes `int`, `bool`, `str`, `float`, `list`, `dict`, `set`, and `tuple`, which are used for typecasting.
+
+We already saw the `sum` funtion in one of the above challenges, (this function sums all the elements of a list). 
+We'll go over a few other useful built-in functions now!
+
+- `len`: returns a length of a list, set, tuple, string, or dictionary
+- `min` and `max`: There built in functions find the min and max of a list.
+- `zip`: This function "zips" together two lists, returning a list of tuples, where each tuple contains the corresponding elements for each list it zipped. It's best understood by example.
+```python
+list1 = [ 1, 2, 3, 4 ]
+list2 = [ "a", "b", "c", "d" ]
+list3 = [ "A", "B", "C", "D" ]
+print zip(list1, list2, list3)
+```
+This prints `[(1, 'a', 'A'), (2, 'b', 'B'), (3, 'c', 'C'), (4, 'd', 'D')]`
+- `filter`: This functions filters a list by a function which returns true or false. For example, the lambda expression `lambda x: x>5` will return true for all numbers greater than 5. Let's say we have a list of numbers `list = [1,2,3,4,5,6,7,8]`.
+```python
+new_list = filter(lambda x: x>5, list)
+print new_list
+```
+This prints `[6, 7, 8]`.
+- `map`: This function applys a funtion to a list and returns a new list. For example, if we want to (again) make a list of every number from 1 to 100 squared. we would do 
+`list = map(lambda x: x ** 2, range(1,101))`. 
+Or, if we wanted to square only the even numbers, we could so `list = map(lambda x: x ** 2, filter(lambda x: x%2 == 0, range(1,101)))`
+We don't need to use lambda expressions, we can use any callable object. 
+This turns a list of integers into strings: `map(str,[1,2,3,4,5])`
+- `any`: Checks a list of booleans and returns true if any of them is true. Like `OR`ing every element. For example,
+```python
+if any(map(lambda x: x == 5, list)):
+    print "5 is in the list!"
+```
+- `all`: Checks that all of a list booleans are true. Like `AND`ing every element. For example,
+```python
+if all(map(lambda x: x == 5, list)):
+    print "This list is just 5s!!!"
+```
+- `reduce`: Repeatedly apply a function to a list. The function called must take two arguments. We'll walk through an example to see how it works.
+Take a list `list = [1,2,3,4,5]`. We call `reduce(lambda x,y: x+y, list)` and this returns 15. It works like so:
+    1. First the function is applied to the first two elements: 1 + 2 = 3.
+    2. Next, the function is applied to the result of the last call, and the next element: 3 + 3 = 6
+    3. Again, until the list is empty. 6 + 4 = 10; 10 + 5 = 15.
+We basically just recreated the sum function!
+
+##### Challenges:
+
+1. Use `len` and `filter` to figure out how many of the words in [this list](https://github.com/hack101/AwesomePython/blob/master/words.txt) have an even number of letters.
+
+<!---
+len(filter(lambda x: len(x)%2 == 0, words))
+--->
+
+2. Use `map` to turn [this](https://github.com/hack101/AwesomePython/blob/master/int_strings.txt) list of strings into their integer values + 2.
+
+
+<!---
+map(lambda x: int(x)+2, list)
+--->
+
+3. Find the second smallest in [this](https://github.com/hack101/AwesomePython/blob/master/numbers.txt) list of integers. (Do not sort!)
+
+<!---
+min(filter(lambda x: x!=min(list), list))
+--->
+
+4. Use reduce to find the maximum of [this](https://github.com/hack101/AwesomePython/blob/master/numbers.txt) list of integers. (Do not use `max` or sort!!!)
+
+<!---
+reduce(lambda x, y: x if x > y else y, list)
+-->
+
+5. Try doing number 3 without the `min` function.
+
+<!---
+reduce(lambda x,y: x if x<y else y, filter(lambda x: x!=reduce(lambda x,y: x if x<y else y, list), list))
+--->
 
 
 

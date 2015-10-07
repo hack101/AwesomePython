@@ -271,4 +271,86 @@ We basically just recreated the sum function!
 4. Use reduce to find the maximum of [this](https://github.com/hack101/AwesomePython/blob/master/numbers.txt) list of integers. (Do not use `max` or sort!!!)
 5. Try doing number 3 without the `min` function.
 
+### 4. Decorators
+
+A lot of the time, while programming, we find outselves writing a whole load of similar functions. 
+Remember, pythonic code is all about beauty and simplicity, and part of that is not repeating yourself.
+Decorators are python's solution to many similar functions. 
+
+A decorator is a function which wraps another function. 
+For example, let's say a lot of your functions are throwing errors and you want to ignore them.
+You might do something like this:
+
+```python
+try:
+    function1()
+except:
+    pass
+
+try:
+    function2()
+except:
+    pass
+
+try:
+    function3()
+except:
+    pass
+.
+.
+.
+```
+
+But you're repeating yourself! We're wrapping each function in a try/catch, so let's use a decorator to do that more easily.
+
+First we define a function which takes a function as it's argument and returns a new function which does not throw errors.
+
+```python
+def noerrors(func): 
+    def wrapper(*args): # define a new function which will be the function we return
+        #inside this function, call the first function and catch all errors
+        try:
+            func(*args)
+        except:
+            pass
+    return wrapper
+```
+
+The `args` with an asterisk is simply a way of saying "As many agruments as you like", since we don't know that arguments `func` may take. 
+See [here](https://docs.python.org/2/tutorial/controlflow.html#arbitrary-argument-lists) for more. 
+
+We now want to apply this new function to our function. Let's make a function which raises an error just to see how it this might work.
+
+```python
+def function():
+    raise Exception()
+
+function() # This raises an error, obviously. 
+
+# now we wrap the function to stop errors
+function = noerrors(function)
+
+function() # No errors!!!
+```
+
+
+Decarators are just a shorthand for doing exactly what we did above! Instead of redefining 
+
+
+
+Of course, we could have found a package on pip to do this for us...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

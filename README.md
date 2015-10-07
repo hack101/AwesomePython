@@ -372,7 +372,7 @@ class MyClass(object):
         self.value = value
 ```
 
-Another useful such method is `__iter__`, which returns an generator (we'll see this in the next sextion, for now think Java iterator) if you want to define an iterable object.
+Another useful such method is `__iter__`, which, (along with a functino called `next()`) makes your object an iterable object.
 I.e. an object which lets you use `for x in MyClass`. 
 
 The method we will use in this case is `__call__`. If an object has a call method, then it is callable and can be used similarly to a function. Here is an example.
@@ -413,8 +413,7 @@ function = decorator(function)
 ```
 
 So our decorator doesn't need to be a function, it just needs to be callable!
-Additionally, when we write `@decorator(args)`, it will call `decorator(args)` on the function.
-So we can leverage callable objects.
+Let's leverage callable objects.
 
 Instead of our `noerrors` function above, let's define a class which accepts as a constructor argument a specific exception to ignore.
 
@@ -456,3 +455,67 @@ function3() # Nothing happens
 2. Create a decorator `HTMLTag` for functions which retun strings. This decorator should wrap all the returned strings in an HTML tag. The decorator should accept an argument which is the tag type.
 3. Create a decorator which counts how many times a function is called and prints this count after each call.
 
+
+### 5. Generators
+
+There are two built in functions you may have encountered in your adventures with python without any immeditately noticible difference: `range` and `xrange`.
+The difference is that `range` returns an array, while xrange returns a generator. 
+
+What's a generator? 
+A generator is a function that behaves like an iterable. 
+Range simply returns a list, which is iterated over.
+A generator preserves its state, and returns the next element when it is asked for.
+
+This is advantageous since it's super space-efficient! Let's look write our own version of `xrange` to get a feel for why that is.
+A generator has the same syntax as a function, however, we replace `return` with `yeild`. Whenever `yield` is reached, that value is returned, and the generator's state is preserved. 
+When the next item is asked for the generator picks up where it left off. So our version of `xrange` might look something like this:
+
+```python
+def generator_range(range_max):
+    i = 0
+    while i < range_max:
+        yield i
+        i += 1
+```
+
+This works as follows:
+1. `for i in generator_range(range_max)` is called, and the loop asks for the first element.
+2. `i` is set to 0, and when yield is reached, `i` is returned. 
+3. When the next item is asked for, the generator picks up again right after the last yield and increments `i`, then yields it again.
+4. This repeats until the function has no more items to yield, and then the loop exits. 
+
+
+What if the range is really big? Like 1,000,000? It is much more efficient to only store one variable and increment that variable up to 1,000,000 than it is to make a list of 1,000,000 variables!
+
+We can use IPython's %%timeit magic function to see this in action (though the real gains are in space, we save time with memory allocation).
+
+```
+In [9]: %%timeit
+for i in xrange(1000000):
+        a = i
+   ...:
+10 loops, best of 3: 30.1 ms per loop
+
+In [10]: %%timeit
+for i in range(1000000):
+        a = i
+   ....:
+10 loops, best of 3: 42.5 ms per loop
+```
+
+The built in function `list` can convert a generator into a list, if you really must...
+
+We can also create new generators from other generators! We use the same notation as list comprehension, with regular parentheses and a generator for the iterable.
+
+Remeber our list of squared numbers we were making before? Let's do it as a generator!
+
+```python
+squares = ( i**2 for i in xrange(1,101))
+```
+
+And now squares is a generator! Note since we didn't define it as a function, it's a one time use deal. Once we iterate over squares, there will be nothing left if we try and iterate again.
+
+
+##### Challenges
+1. Write a generator that gives you all the numbers up to 100, squared, without using `xrange`. How about all the even numbers?
+2. Write a generator for the generates all prime numbers. 

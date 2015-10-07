@@ -32,7 +32,7 @@ Python is equipped with some awesome tools to help you write code in this fashio
 
 Being a powerful language isn't all about the built in tools. 
 Python is also great because it has a very nice package manager and plenty of packages to tackle almost any problem.
-You can think of pacakges as libraries: large amounts of code that someone else has written to complete a task, and that you can easily use in your code.
+You can think of packages as libraries: large amounts of code that someone else has written to complete a task, and that you can easily use in your code.
 
 For example, lets say I wanted to find all the webpages that are linked to by an url. It's easy with Python! 
 Use pip install a library called beautiful soup with:  `pip install beautifulsoup`, 
@@ -55,7 +55,7 @@ for link in BeautifulSoup(response, parseOnlyThese=SoupStrainer('a')):
 We'll learn about list comprehension which actually lets you do this in a prettier and shorter way!
 
 
-One other great thing about python is that it has an interactive mode, which is great for developement. 
+One other great thing about python is that it has an interactive mode, which is great for development. 
 Unlike other languages (like C or Java) which need to be compiled before they are run, 
 you can write python code in a shell and see the output.
 For this tutorial, I will be writing my code in the interactive mode.
@@ -91,10 +91,10 @@ array = [ i**2 for i in range(1,101) ]
 As *The Zen of Python* states, our goals are readability and beauty. 
 The new code is much more readable than the previous version.
 Though it may seem insignificant for such a simple list, as lists become more and more complex,
-list comprehenisions become infinitely more readable than their for loop-and-append couterparts.
+list comprehensions become infinitely more readable than their for loop-and-append couterparts.
 
 They also have another feature, filters. Let's say we want to change the above list and only have a list of all even numbers from 1 to 100, squared.
-We use the syntax `array = [<expression> for <variable> in <interable> if <condition>]`
+We use the syntax `array = [<expression> for <variable> in <iterable> if <condition>]`
 
 ```python
 array = [ i**2 for i in range(1,101) if i%2 == 0]
@@ -136,7 +136,7 @@ dictionary = { line[0]: int(line[1]) for line in [ line.strip().split(',') for l
 file.close()
 ```
 
-Here, the interable in our comprehension is another comprehension! We can also have a filter, like in list comprehensions.
+Here, the iterable in our comprehension is another comprehension! We can also have a filter, like in list comprehensions.
 
 ```python
 file = open("numbers.csv","rt")
@@ -222,7 +222,7 @@ Built-in functions are exactly that, functions that are built into python. For a
 
 This list includes `int`, `bool`, `str`, `float`, `list`, `dict`, `set`, and `tuple`, which are used for typecasting.
 
-We already saw the `sum` funtion in one of the above challenges, (this function sums all the elements of a list). 
+We already saw the `sum` function in one of the above challenges, (this function sums all the elements of a list). 
 We'll go over a few other useful built-in functions now!
 
 - `len`: returns a length of a list, set, tuple, string, or dictionary
@@ -241,7 +241,7 @@ new_list = filter(lambda x: x>5, list)
 print new_list
 ```
 This prints `[6, 7, 8]`.
-- `map`: This function applys a funtion to a list and returns a new list. For example, if we want to (again) make a list of every number from 1 to 100 squared. we would do 
+- `map`: This function applies a function to a list and returns a new list. For example, if we want to (again) make a list of every number from 1 to 100 squared. we would do 
 `list = map(lambda x: x ** 2, range(1,101))`. 
 Or, if we wanted to square only the even numbers, we could so `list = map(lambda x: x ** 2, filter(lambda x: x%2 == 0, range(1,101)))`
 We don't need to use lambda expressions, we can use any callable object. 
@@ -273,7 +273,7 @@ We basically just recreated the sum function!
 
 ### 4. Decorators
 
-A lot of the time, while programming, we find outselves writing a whole load of similar functions. 
+A lot of the time, while programming, we find ourselves writing a whole load of similar functions. 
 Remember, pythonic code is all about beauty and simplicity, and part of that is not repeating yourself.
 Decorators are python's solution to many similar functions. 
 
@@ -316,7 +316,7 @@ def noerrors(func):
     return wrapper
 ```
 
-The `args` with an asterisk is simply a way of saying "As many agruments as you like", since we don't know that arguments `func` may take. 
+The `args` with an asterisk is simply a way of saying "As many arguments as you like", since we don't know that arguments `func` may take. 
 See [here](https://docs.python.org/2/tutorial/controlflow.html#arbitrary-argument-lists) for more. 
 
 We now want to apply this new function to our function. Let's make a function which raises an error just to see how it this might work.
@@ -327,30 +327,132 @@ def function():
 
 function() # This raises an error, obviously. 
 
-# now we wrap the function to stop errors
+ # now we wrap the function to stop errors
 function = noerrors(function)
 
 function() # No errors!!!
 ```
 
 
-Decarators are just a shorthand for doing exactly what we did above! Instead of redefining 
+Decorators are just a shorthand for doing exactly what we did above! Instead of redefining `function` like we did above, we can write
+
+```python
+@noerrors
+def function():
+    raise Exception
+```
+
+This is entirely equivalent to `function = noerrors(function)`!
+
+Of course, we could have found a package on pip to do this for us... [https://pypi.python.org/pypi/fuckit/4.8.0](https://pypi.python.org/pypi/fuckit/4.8.0).
+
+What if we want to change our decorator each time? Let's say we want a decorator that only catches `NameError`s, and another that only catches `ArithmeticError`s?
+
+We could write a different decorator for each type of exception, but then we'd be repeating ourselves, and that's not what we're all about.
+Instead, we would like to pass an argument to our decorator telling it which exception to ignore. 
+The problem is that decorators can take one argument and one argument only, the function they are on top of. 
+Remember, when we use a decorator, it is equivalent to doing `function = decorator(function)` How do we pass extra arguments here!?
+
+Our goal is to be able to write this:
+```python
+@decorator(<decorator arguments>)
+def function():
+    ...
+```
+
+For this we use *callable objects*
+
+In Python, there are certain methods that can de defined when writing a class that give the class certain properties.
+All these methods look like this `__method__()`. For example, a constructor in python looks like this:
+
+```python
+class MyClass(object):
+    def __init__(self, value):
+        # this is a constructor
+        self.value = value
+```
+
+Another useful such method is `__iter__`, which returns an generator (we'll see this in the next sextion, for now think Java iterator) if you want to define an iterable object.
+I.e. an object which lets you use `for x in MyClass`. 
+
+The method we will use in this case is `__call__`. If an object has a call method, then it is callable and can be used similarly to a function. Here is an example.
+
+```python
+class Adder(object):
+    """
+    Creates an object which will act as an adder, adding a given amount to every number it is called on
+    """
+    def __init__(self, amount):
+        self.amount = amount
+
+    def __call__(self, x):
+        return self.amount + x
+
+# create an adder which will add 5 to a number
+adder = Adder(5)
+x = adder(10) #  x => 15
+```
+
+Let's look back at generators. All a decorator does is translate this:
+
+```python
+@decorator
+def function(args):
+    # stuff
+    pass
+```
+
+to:
+
+```python
+def function(args):
+    # stuff
+    pass
+
+function = decorator(function)
+```
+
+So our decorator doesn't need to be a function, it just needs to be callable!
+Additionally, when we write `@decorator(args)`, it will call `decorator(args)` on the function.
+So we can leverage callable objects.
+
+Instead of our `noerrors` function above, let's define a class which accepts as a constructor argument a specific exception to ignore.
+
+```python
+class noerrors(object):
+    def __init__(self, exception=Exception):
+        self.exception = exception
+
+    def __call__(self, function):
+        def wrapper(*args):
+            try:
+                function(*args)
+            except self.exception:
+                pass
+        return wrapper
+
+@noerrors()
+def function1():
+    raise Exception()
+
+@noerrors(ArithmeticError)
+def function2():
+    raise NameError()
+
+@noerrors(ArithmeticError)
+def function3():
+    raise ArithmeticError()
 
 
+function1() # Nothing happens
 
-Of course, we could have found a package on pip to do this for us...
+function2() # Raises Exception
 
+function3() # Nothing happens
+```
 
-
-
-
-
-
-
-
-
-
-
-
-
+##### Challenges
+1. Create a decorator `paragraph` which is for functions which return strings. The decorator shold return the strings inside `<p></p>` HTML tags.
+2. Create a decorator `HTMLTag` for functions which retun strings. This decorator should wrap all the returned strings in an HTML tag. The decorator should accept an argument which is the tag type.
+3. Create a decorator which counts how many times a function is called and prints this count after each call.
 

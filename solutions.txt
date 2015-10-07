@@ -20,6 +20,32 @@
  reduce(lambda x, y: x if x > y else y, list)
 3.5
  reduce(lambda x,y: x if x<y else y, filter(lambda x: x!=reduce(lambda x,y: x if x<y else y, list), list))
-
+4.1
+ def paragraph(function):
+     def wrapper(*args):
+         return "<p>"+function(*args)+'</p>'
+ 
+     return wrapper
+4.2
+ class HTMLTag(object):
+     def __init__(self, tag):
+         assert type(tag) == str
+         self.tag = tag
+ 
+     def __call__(self, func):
+         def wrapper(*args):
+             return '<{tag}>{string}</{tag}>'.format(tag=self.tag, string=func(*args))
+         return wrapper
+4.3
+ class count(object):
+     def __init__(self):
+         self.count = 0
+ 
+     def __call__(self, func):
+         def wrapper(*args):
+             self.count += 1
+             func(*args)
+             print "{name} called {count} times".format(name=func.__name__, count=self.count)
+         return wrapper
 
 

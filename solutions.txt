@@ -5,7 +5,8 @@
 1.3
  [ x for sl in l for x in sl ] 
 1.4
- print "\n".join([ "FizzBuzz" if not i%3 and not i%5 else "Fizz" if not i%3 else "Buzz" if not i%5 else str(i) for i in range(1,21) ]) 
+ # thanks Usman for the improved solution!
+ print '\n'.join(["Fizz"(i%3==0) + "Buzz"(i%5==0) or i for i in range(1,21)])
 2.1
  words.sort(key=lambda x: x[2]) 
 2.2

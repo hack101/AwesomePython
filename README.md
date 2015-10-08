@@ -159,6 +159,8 @@ with open("number.csv", "rt") as f:
     # Do something with the file handler f
 ```
 
+What this says is "Open the file, assign it's value to f, and then execute a block of code".
+
 The advantage of this approach is that user does not have to worry about closing files when dealing with them. Now you can do all you need within the context of the file and once you are done, the file will be closed. Even if there is an exception, the file will be closed before exiting the context of the with statement. The with statement is part of a bigger concept in Python called context-managers.
 
 
@@ -410,7 +412,7 @@ adder = Adder(5)
 x = adder(10) #  x => 15
 ```
 
-Let's look back at generators. All a decorator does is translate this:
+Let's look back at decorators. All a decorator does is translate this:
 
 ```python
 @decorator

@@ -81,11 +81,11 @@ for i in range(1,101):
 ```
 
 List comprehensions let us do this all in one expression!
-List comprehensions are of the form: ` array = [ <expression> for <variable> in <iterable> ]`.
+List comprehensions are of the form: ` array = [<expression> for <variable> in <iterable>]`.
 The code above becomes:
 
 ```python
-array = [ i**2 for i in range(1,101) ]
+array = [i**2 for i in range(1,101)]
 ```
 
 As *The Zen of Python* states, our goals are readability and beauty. 
@@ -97,7 +97,7 @@ They also have another feature, filters. Let's say we want to change the above l
 We use the syntax `array = [<expression> for <variable> in <iterable> if <condition>]`
 
 ```python
-array = [ i**2 for i in range(1,101) if i%2 == 0]
+array = [i**2 for i in range(1,101) if i%2 == 0]
 ```
 
 We can also use these comprehensions for dictionaries! Let's say we have a CSV file with Names and Phone Numbers, and we want them in a python dictionary.
@@ -122,27 +122,25 @@ To turn it into an array like above, we use to methods.
 First we use `strip` to get rid of the `\n`, then we use `split(',')` to split it at the comma. So the above array can be made like so:
 
 ```python
-file = open("numbers.csv","rt")
-[ line.strip().split(',') for line in file ]
+with open("numbers.csv","rt") as f:
+    print [line.strip().split(',') for line in f]
 ```
 
 Now, we want to turn this into a dictionary, where each name is used as a key to find each phone number (which is an integer).
 We do that in the same way as we did list comprehensions:
-`{ <expression in the form 'key: value'> for <value> in <iterable> }`. 
+`{<expression in the form 'key: value'> for <value> in <iterable>}`. 
 
 ```python
-file = open("numbers.csv","rt")
-dictionary = { line[0]: int(line[1]) for line in [ line.strip().split(',') for line in file ] }
-file.close()
+with open("numbers.csv","rt") as f:
+    dictionary = {line[0]: int(line[1]) for line in [line.strip().split(',') for line in file]}
 ```
 
 Here, the iterable in our comprehension is another comprehension! We can also have a filter, like in list comprehensions.
 
 ```python
-file = open("numbers.csv","rt")
+with open("numbers.csv","rt") as f:
 # I really don't like Dave...
-dictionary = { line[0]: int(line[1]) for line in [ line.strip().split(',') for line in file ] if line[0] != "Dave" }
-file.close()
+    dictionary = {line[0]: int(line[1]) for line in [line.strip().split(',') for line in file] if line[0] != "Dave"}
 ```
 
 If you're interested in going beyond the tutorial, this would be a good place to learn about [context managers](https://docs.python.org/2/reference/compound_stmts.html#the-with-statement)!
@@ -372,7 +370,7 @@ class MyClass(object):
         self.value = value
 ```
 
-Another useful such method is `__iter__`, which, (along with a functino called `next()`) makes your object an iterable object.
+Another useful such method is `__iter__`, which, (along with a function called `next()`) makes your object an iterable object.
 I.e. an object which lets you use `for x in MyClass`. 
 
 The method we will use in this case is `__call__`. If an object has a call method, then it is callable and can be used similarly to a function. Here is an example.

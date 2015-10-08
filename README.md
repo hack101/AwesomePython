@@ -143,6 +143,25 @@ with open("numbers.csv","rt") as f:
     dictionary = {line[0]: int(line[1]) for line in [line.strip().split(',') for line in file] if line[0] != "Dave"}
 ```
 
+#### Note
+Normally this is how one opens a file in Python:
+
+```python
+f = open("number.csv", "rt")
+# Do something with the file handler f
+f.close() # Close the file handler once done
+```
+
+Here is the Pythonic way:
+
+```python
+with open("number.csv", "rt") as f:
+    # Do something with the file handler f
+```
+
+The advantage of this approach is that user does not have to worry about closing files when dealing with them. Now you can do all you need within the context of the file and once you are done, the file will be closed. Even if there is an exception, the file will be closed before exiting the context of the with statement. The with statement is part of a bigger concept in Python called context-managers.
+
+
 If you're interested in going beyond the tutorial, this would be a good place to learn about [context managers](https://docs.python.org/2/reference/compound_stmts.html#the-with-statement)!
 
 ###### Challenges

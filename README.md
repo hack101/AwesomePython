@@ -132,7 +132,7 @@ We do that in the same way as we did list comprehensions:
 
 ```python
 with open("numbers.csv","rt") as f:
-    dictionary = {line[0]: int(line[1]) for line in [line.strip().split(',') for line in file]}
+    dictionary = {line[0]: int(line[1]) for line in [line.strip().split(',') for line in f]}
 ```
 
 Here, the iterable in our comprehension is another comprehension! We can also have a filter, like in list comprehensions.
@@ -140,7 +140,7 @@ Here, the iterable in our comprehension is another comprehension! We can also ha
 ```python
 with open("numbers.csv","rt") as f:
 # I really don't like Dave...
-    dictionary = {line[0]: int(line[1]) for line in [line.strip().split(',') for line in file] if line[0] != "Dave"}
+    dictionary = {line[0]: int(line[1]) for line in [line.strip().split(',') for line in f] if line[0] != "Dave"}
 ```
 
 #### Note

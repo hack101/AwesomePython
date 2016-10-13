@@ -51,12 +51,33 @@
              if is_prime(n):
                  break
 5.1
+def mysum(*args):
+    return sum(args)
+5.1.1
+def mysum(*args, **kwargs):
+    nums = args
+    op = kwargs.get('operator','add')
+    op = {
+        'add': lambda x, y: x+y,
+        'mul': lambda x, y: x*y,
+        'sub': lambda x, y: x-y,
+    }[op]
+    if 'toint' in kwargs and kwargs['toint']:
+        nums = map(int, nums)
+    result = reduce(op, nums)
+    if 'prnt' in kwargs and kwargs['prnt']:
+        print result
+    return result
+5.2
+def unzip(l):
+    return zip(*l)
+6.1
  def paragraph(function):
      def wrapper(*args):
          return "<p>"+function(*args)+'</p>'
  
      return wrapper
-5.2
+6.2
  class HTMLTag(object):
      def __init__(self, tag):
          assert type(tag) == str
@@ -66,7 +87,7 @@
          def wrapper(*args):
              return '<{tag}>{string}</{tag}>'.format(tag=self.tag, string=func(*args))
          return wrapper
-5.3
+6.3
  class count(object):
      def __init__(self):
          self.count = 0

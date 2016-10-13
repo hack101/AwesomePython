@@ -416,7 +416,175 @@ And this will only look at lines one at a time, remebering it's position each ti
 1. Write a generator that gives you all the numbers up to 100, squared, without using `xrange`. How about all the even numbers?
 2. Write a generator for the generates all prime numbers. 
 
-### 5. Decorators
+### 5. Argument Unpacking
+
+Argument unpacking is a way of having functions take variable numbers of arguments. There are two ways of having a variable number of arguments
+
+##### `*args`: Regular arguments
+When defining a function, having a `*args` argument takes all extra arguments and and puts them into an array. You can then use this array any way you'd like in your function!
+
+Just to get an idea of what's going on, try running this:
+```python
+def print_args(*args):
+    print args
+
+print_args()  # (,)
+print_args(1,2,3,4)  # (1,2,3,4)
+```
+
+`*args` will gobble up all the positional arguments after the ones you explicitly declare (called formal arguments), and put them in an array called `args`. Note that the name `args` is not important. We could just as easily write
+```python
+def print_args(*foo):
+    print foo
+```
+
+But as a matter of convention, it is always `args`. 
+
+We use `*args` for when we want a function to take a variable number of regular (i.e. positional, not keyword) arguments. Let's imagine a contrived example. Let's say I want a print function which takes an int `margin` and any number of strings then prints each string with a left padding of `margin`. For example
+
+```python
+my_print(3, "Hi", "This is a test")
+#   Hi
+#   This is a test
+my_print(5, "Now", "with", "more", "strings!!")
+#     Now
+#     with
+#     more
+#     strings
+```
+
+But in what we've seen so far, we can't have the same function take a different number of arguments! Enter `*args`. 
+```python
+def my_print(margin, *args):
+    for s in args:
+        print " "*margin + s
+```    
+
+The `*` operator can also be used to pass an array to a function as positional arguments, the inverse of the operation above.
+
+For example, 
+```python
+def add(a, b):
+    return a + b
+
+vals = [2, 3]
+print add(*vals)  # prints 5
+```
+The above puts the first element of `vals` into `a` and the second into `b`.
+
+##### `**kwargs`: Keyword arguments
+
+`**kwargs` is similar to above in that it gives us the opportunity to use multiple arguements, but instead of these arguments being positional and given as an array, they are *keyword arguments* and given to us as a dictionary.
+Let's have a look at a simple example
+
+```python
+def print_kwargs(**kwargs):
+    print kwargs
+
+print_kwargs()  # {}
+print_kwargs(val1=1, val2="test")  # {'val2': 'test', 'val1': 1}
+```
+
+Once again, there is nothing special about the name `kwargs` (`**bar` would work just as well), but it is always used as a matter of convention.
+
+`**kwargs` is often used to have functions take a large number of settings. 
+
+For example, let's say we want to add an optional setting to `my_print`, `lower`.
+If `lower` is `True`, all the strings are converted to lowercase, otherwise not.
+
+```python
+def my_print(margin, *args, **kwargs):
+    strings = args
+    if 'lower' in kwargs and kwargs['lower']:
+        strings = map(lambda s: s.lower(), strings)
+    for s in strings:
+        print " "*margin + s
+
+
+my_print(3, "Hi", "This is a test")
+#   Hi
+#   This is a test
+my_print(3, "Hi", "This is a test", lower=True)
+#   hi
+#   this is a test
+```
+
+Let's try add another optional argument! `start`, a string which, if present, will be used to start each line.
+
+```python
+def my_print(margin, *args, **kwargs):
+    strings = args
+    if 'lower' in kwargs and kwargs['lower']:
+        strings = map(lambda s: s.lower(), strings)
+    start = kwargs.get('start', '')
+    for s in strings:
+        print start + " "*margin + s
+
+my_print(3, "Hi", "This is a test", lower=True, start=':::')
+#:::   hi
+#:::   this is a test
+```
+
+The `get` function used there is a method of dictionaries which
+returns the value for a given key, if the key is present and returns the second argument if the key is not. Check out [here](https://www.tutorialspoint.com/python/dictionary_get.htm) if you've never seen it before. 
+
+Like the `*` operator could be used to do the inverse of `*args`, so can the `**` operator!
+
+In our contrived example, we could do
+```python
+settings = {'lower': True, 'start': '->'}
+my_print(3, "Hi", "This is a test", **settings)
+#->   hi
+#->   this is a test
+```
+
+A cool application of this is string formatting. Python has a built in function `locals`, which when called returns a dictionary with all the local variables in the current scope.
+```python
+def func():
+    x = 5
+    print locals()
+
+func()  # {'x': 5}
+```
+
+We can unpack this to pass a function all the current variables as kwargs!
+We'll use this for string formatting. Consider the following example.
+```python
+name = "Bob"
+amount = "10"
+tax = "15"
+tip = "18"
+bill_stmt = "Hi {name}, you owe {amount}. There is a "\
+         "{tax}% tax and we reccomend a tip of {tip}%".format(
+        name=name,
+        amount=amount,
+        tax=tax,
+        tip=tip)
+```
+
+Let's try using argument unpacking
+```python
+name = "Bob"
+amount = "10"
+tax = "15"
+tip = "18"
+bill_stmt = "Hi {name}, you owe {amount}. There is a "\
+         "{tax}% tax and we reccomend a tip of {tip}%".format(**locals())
+```
+
+This example may seem a little contrived, but this type of string interpolation can come in handy! (Ruby has it built in, but lets not talk about that...)
+
+##### Challenges
+1. Write a `mysum` function which takes its arguments positionally rather than as a list. So `mysum(1,2) -> 3`, `mysum(5, 2, 7) -> 14`. __Optional__: Add keyword args to a) allow multiplcation or subtraction, b) print the result, c) convert all floats to ints.
+2. (This one can be tricky to wrap your head around!) Write an unzip function, which is the inverse of zip. unzip should take a list of lists and unzip them. It should be one or two lines. For example:
+```python
+l1 = (1,2,3)
+l2 = ('a','b','c')
+zipped = zip(l1,l2)  # [(1, 'a'), (2, 'b'), (3, 'c')]
+unzipped = unzip(zipped)  # [(1, 2, 3), ('a', 'b', 'c')]
+```
+
+### 6. Decorators
 
 ##### Note: In Python everything is an object
 It's probably worth noting here that in python, everything is an object, including functions!! Above when we saw `f = lambda x: x+2`, we were able to assign a variable to a function because functions are just objects, like any other variable! So below, when we define a function which takes another function as its argument, that's totally fine! As far as python is concerned, taking a function as an argument is the same as taking an integer as an argument. The same goes for returning a function from a function.  
@@ -486,8 +654,7 @@ def noerrors(func):
     return wrapper
 ```
 
-The `args` with an asterisk is simply a way of saying "As many arguments as you like", since we don't know that arguments `func` may take. 
-See [here](https://docs.python.org/2/tutorial/controlflow.html#arbitrary-argument-lists) for more.
+We use `*args` here since we don't know that arguments `func` may take and we want to pass them all along.
 
 We now want to apply this new function to our function. Let's make a function which raises an error just to see how it this might work.
 

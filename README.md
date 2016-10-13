@@ -46,7 +46,7 @@ http = httplib2.Http()
 status, response = http.request('http://www.nytimes.com')
 
 for link in BeautifulSoup(response, parseOnlyThese=SoupStrainer('a')):
-    if link.has_attr('href'):
+    if link.has_key('href'):
         print link['href']
 ```
 [Source](http://stackoverflow.com/questions/1080411/retrieve-links-from-web-page-using-python-and-beautifulsoup)
@@ -63,10 +63,11 @@ I'll also be using IPython, which is a special python shell you can install with
 IPython offers things like tab-completion and basic OS commands. 
 We'll see some of its awesome features as we go through the tutorial!
 
-To get started with python, open up your terminal and type `python`.
-If to use IPython, simply type `ipython`. If IPython doesn't exist,
-you may need to run one `sudo pip install ipython` or `pip install ipython --user`, for your home computer or a Trottier computer respectively. 
-If you don't have pip, see here: [http://pip.readthedocs.org/en/stable/installing/](http://pip.readthedocs.org/en/stable/installing/)
+Vanilla interactive python is started opening terminal and by typing
+`python`, but we're going to use IPython, so instead we'll type `ipython`.
+If IPython doesn't exist,you may need to run `sudo pip install ipython` 
+or `pip install ipython --user`, for your home computer or a Trottier 
+computer respectively. If you don't have pip, see here: [http://pip.readthedocs.org/en/stable/installing/](http://pip.readthedocs.org/en/stable/installing/)
 
 
 ### 1. List and Dictonary Comprehension
@@ -100,6 +101,21 @@ We use the syntax `array = [<expression> for <variable> in <iterable> if <condit
 array = [i**2 for i in range(1,101) if i%2 == 0]
 ```
 
+(It would probably be better to just use `range(1,101,2)`, but then I don't get to show off as many cool python features...)
+
+Let's revisit the example above of getting all the links in a page. Can we improve it with a list comprehension?
+
+```python
+import httplib2
+from BeautifulSoup import BeautifulSoup, SoupStrainer
+
+http = httplib2.Http()
+status, response = http.request('http://www.nytimes.com')
+soup = BeautifulSoup(response, parseOnlyThese=SoupStrainer('a'))
+
+links = [link['href'] for link in soup if link.has_key('href')]
+```
+
 We can also use these comprehensions for dictionaries! Let's say we have a CSV file with Names and Phone Numbers, and we want them in a python dictionary.
 
 The file looks like so:
@@ -122,25 +138,53 @@ To turn it into an array like above, we use to methods.
 First we use `strip` to get rid of the `\n`, then we use `split(',')` to split it at the comma. So the above array can be made like so:
 
 ```python
-with open("numbers.csv","rt") as f:
+with open("phonebook.csv","rt") as f:
     print [line.strip().split(',') for line in f]
 ```
+
+This doesn't look too pretty though... We can also use the `csv` package that's built into python!
+```python
+import csv
+with open("phonebook.csv","rt") as f:
+    print [row for row in csv.reader(f)]
+```
+Much better! 
 
 Now, we want to turn this into a dictionary, where each name is used as a key to find each phone number (which is an integer).
 We do that in the same way as we did list comprehensions:
 `{<expression in the form 'key: value'> for <value> in <iterable>}`. 
 
 ```python
-with open("numbers.csv","rt") as f:
-    dictionary = {line[0]: int(line[1]) for line in [line.strip().split(',') for line in f]}
+with open("phonebook.csv","rt") as f:
+    print {row[0]: int(row[1]) for row in csv.reader(f)}
 ```
 
-Here, the iterable in our comprehension is another comprehension! We can also have a filter, like in list comprehensions.
+Cool! Could it be more readable though? The `row[i]` isn't too clear... Python has one more cool trick up its sleeve! (actually it has tons more) When we're iterating over an array of arrays, we can unpack the subarrays into variables! It's best explained with an example 
 
 ```python
-with open("numbers.csv","rt") as f:
-# I really don't like Dave...
-    dictionary = {line[0]: int(line[1]) for line in [line.strip().split(',') for line in f] if line[0] != "Dave"}
+with open("phonebook.csv","rt") as f:
+    print {name: int(num) for name, num in csv.reader(f)}
+```
+
+Now that's readable! What's happening when we have `x, y in z` is the first element of each row is assigned to `x` and the second element to `y`, then the expression is evaluated. More explicitly, here's what the loop-and-append couterpart would look like
+```python
+with open("phonebook.csv","rt") as f:
+    phonebook = {}
+    for row in csv.reader(f):
+        name = row[0]    # These two lines are like:
+        num = row[1]     #     name, num in csv.reader(f)
+        phonebook[name] = int(num)
+```
+
+*Note:*  `name, num = row` would also be a valid operation above! The expression
+`a,b = [1,2]` does the assignment `a=1;b=2`. 
+
+We can also have a filter, like in list comprehensions.
+
+```python
+with open("phonebook.csv","rt") as f:
+    # I really don't like Dan...
+    print {name: int(num) for name, num in csv.reader(f) if name[:3] != 'Dan'}
 ```
 
 #### Note
@@ -161,7 +205,7 @@ with open("number.csv", "rt") as f:
 
 What this says is "Open the file, assign it's value to f, and then execute a block of code".
 
-The advantage of this approach is that user does not have to worry about closing files when dealing with them. Now you can do all you need within the context of the file and once you are done, the file will be closed. Even if there is an exception, the file will be closed before exiting the context of the with statement. The with statement is part of a bigger concept in Python called context-managers.
+The advantage of this approach is that user does not have to worry about closing files when dealing with them. Now you can do all you need within the context of the file and once you are done, the file will be closed. Even if there is an exception, the file will be closed before exiting the context of the `with` statement. The with statement is part of a bigger concept in Python called context-managers.
 
 
 If you're interested in going beyond the tutorial, this would be a good place to learn about [context managers](https://docs.python.org/2/reference/compound_stmts.html#the-with-statement)!
@@ -178,6 +222,7 @@ Take this list (you can copy and paste it) and create a new list using dictionar
 *Note:* This list of words was created using a list comprehension! Click [here](https://github.com/hack101/AwesomePython/blob/master/words.py) if you are interested in seeing how.
 3. Try using list comprehension to flatten a list. For example, if `l=[ [1,2], [3,4], [5,6] ]`, we want to turn it into `[ 1, 2, 3, 4, 5, 6]`.
 4. (FizzBuzz) Write a program that prints the numbers from 1 to 100. But for multiples of three print “Fizz” instead of the number and for the multiples of five print “Buzz”. For numbers which are multiples of both three and five print “FizzBuzz”. -- Try to do this in one line. You will need to use [join](http://www.tutorialspoint.com/python/string_join.htm).
+*Hint*: There are multiple solutions but one of them uses that you can multiply strings to repeat them: `"a"*5 = "aaaaa"; "a"*0 = ""`.
 
 ### 2. Lambda Expressions
 
@@ -187,7 +232,7 @@ Lambda expressions are how we do that.
 
 They have the following syntax:
 
-```python
+```
 lambda <arguments>: <what to return from arguemnts>
 ```
 
@@ -218,21 +263,21 @@ The value of `key` should be a function that tells the sorting method what to so
 Maybe you want to do a reverse sort of a list.
 
 ```python
-list = [ 3, 5, 2, 6, 10, 1 ]
-list.sort()
-print list # this prints [1, 2, 3, 5, 6, 10]
+l = [ 3, 5, 2, 6, 10, 1 ]
+l.sort()
+print l # this prints [1, 2, 3, 5, 6, 10]
 
 # Now let's use key to do a reverse sort.
 # We tell sort that it should sort each element by its negative value
-list.sort(key=lambda x: -x)
-print list # this prints [10, 6, 5, 3, 2, 1]
+l.sort(key=lambda x: -x)
+print l # this prints [10, 6, 5, 3, 2, 1]
 ```
 
 ##### Challenges
 
 1. Take the list of words [here](https://github.com/hack101/AwesomePython/blob/master/words.txt) and sort them by their third letter.
 2. (This one is a little difficult!) Try writing a method to sort a list using [quicksort](http://me.dt.in.th/page/Quicksort/) in only 1 line. 
-You will need both list comprehension as well as lambda expressions. Hint: recursion is fine in lambda expressions. 
+You will need both list comprehension as well as lambda expressions. Hint: recursion is fine in lambda expressions using the python ternary. 
 So `fib = lambda n: 1 if n == 1 else n * fib(n-1)`.
 
 ### 3. Built-in Functions
@@ -246,7 +291,7 @@ We'll go over a few other useful built-in functions now!
 
 - `len`: returns a length of a list, set, tuple, string, or dictionary
 - `min` and `max`: There built in functions find the min and max of a list.
-- `zip`: This function "zips" together two lists, returning a list of tuples, where each tuple contains the corresponding elements for each list it zipped. It's best understood by example.
+- `zip`: This function "zips" together two or more lists, returning a list of tuples, where each tuple contains the corresponding elements for each list it zipped. It's best understood by example.
 ```python
 list1 = [ 1, 2, 3, 4 ]
 list2 = [ "a", "b", "c", "d" ]
@@ -254,17 +299,21 @@ list3 = [ "A", "B", "C", "D" ]
 print zip(list1, list2, list3)
 ```
 This prints `[(1, 'a', 'A'), (2, 'b', 'B'), (3, 'c', 'C'), (4, 'd', 'D')]`
-- `filter`: This functions filters a list by a function which returns true or false. For example, the lambda expression `lambda x: x>5` will return true for all numbers greater than 5. Let's say we have a list of numbers `list = [1,2,3,4,5,6,7,8]`.
+- `filter`: As the name suggests, this functions *filters* a list. A filter is a function which returns true or false. This function is applied to each element and only those elements which return true are kept. For example, the lambda expression `lambda x: x>5` will return true for all numbers greater than 5. Consider the following example:
 ```python
+list = [1,2,3,4,5,6,7,8]
 new_list = filter(lambda x: x>5, list)
-print new_list
+print new_list  # prints [6, 7, 8]
 ```
-This prints `[6, 7, 8]`.
-- `map`: This function applies a function to a list and returns a new list. For example, if we want to (again) make a list of every number from 1 to 100 squared. we would do 
-`list = map(lambda x: x ** 2, range(1,101))`. 
-Or, if we wanted to square only the even numbers, we could so `list = map(lambda x: x ** 2, filter(lambda x: x%2 == 0, range(1,101)))`
-We don't need to use lambda expressions, we can use any callable object. 
-This turns a list of integers into strings: `map(str,[1,2,3,4,5])`
+- `map`: `map` takes a function and it to each element of a list and returns a new list. For example, if we want to (again) make a list of every number from 1 to 100 squared. we could define a function which squares a number and `map` it over `range(1,101)`.
+```python
+list = map(lambda x: x ** 2, range(1,101))
+```
+Or, if we wanted to square only the even numbers, we could first use `filter` to get the even numbers then use `map` to square them 
+```python
+list = map(lambda x: x ** 2, filter(lambda x: x%2 == 0, range(1,101)))
+```
+We don't need to use lambda expressions, we can use any *callable* object (i.e. anything you can use as a function). We can use a function we defined in the usual `def` way, or even another builtin function. For example, this turns a list of integers into strings: `map(str,[1,2,3,4,5])`
 - `any`: Checks a list of booleans and returns true if any of them is true. Like `OR`ing every element. For example,
 ```python
 if any(map(lambda x: x == 5, list)):
@@ -276,11 +325,16 @@ if all(map(lambda x: x == 5, list)):
     print "This list is just 5s!!!"
 ```
 - `reduce`: Repeatedly apply a function to a list. The function called must take two arguments. We'll walk through an example to see how it works.
-Take a list `list = [1,2,3,4,5]`. We call `reduce(lambda x,y: x+y, list)` and this returns 15. It works like so:
-    1. First the function is applied to the first two elements: 1 + 2 = 3.
-    2. Next, the function is applied to the result of the last call, and the next element: 3 + 3 = 6
-    3. Again, until the list is empty. 6 + 4 = 10; 10 + 5 = 15.
+```python
+list = [1,2,3,4,5]
+print reduce(lambda x, y: x + y, list)  # This prints 15
+```
+It works like so:
+1. First the function is applied to the first two elements: 1 + 2 = 3.
+2. Next, the function is applied to the result of the last call, and the next element: 3 + 3 = 6 (if you like mathy notation, this is *f( f(1, 2), 3)*.)
+3. Again, until the list is empty. 6 + 4 = 10; 10 + 5 = 15.
 We basically just recreated the sum function!
+
 
 ##### Challenges:
 
@@ -288,12 +342,109 @@ We basically just recreated the sum function!
 2. Use `map` to turn [this](https://github.com/hack101/AwesomePython/blob/master/int_strings.txt) list of strings into their integer values + 2.
 3. Find the second smallest in [this](https://github.com/hack101/AwesomePython/blob/master/numbers.txt) list of integers. (Do not sort!)
 4. Use reduce to find the maximum of [this](https://github.com/hack101/AwesomePython/blob/master/numbers.txt) list of integers. (Do not use `max` or sort!!!)
-5. Try doing number 3 without the `min` function.
+5. *(This one is a little tricky!)* Use reduce to get the two smallest numbers of [this](https://github.com/hack101/AwesomePython/blob/master/numbers.txt) list of integers. You will need to use the fact that `reduce` takes an option third argument which is a starting `x`. `reduce(lambda x,y: x*y, [1,2,3], 0)` will return 0, not 6. The first function call it makes puts `0` in the `x` position. The advantage of this is that you can have `x` and `y` be different types (as long as the function returns the same type as `x`). You may also need to use the fact that `float('inf')` has the property that it is larger than every number.
 
-### 4. Decorators
+
+### 4. Generators
+
+There are two built in functions you may have encountered in your adventures with python without any immeditately noticible difference: `range` and `xrange`.
+The difference is that `range` returns an array, while xrange returns a generator. 
+
+What's a generator? 
+A generator is a function that behaves like an iterable. The purpose of an iterator is to give us data one item at a time. The simple way is just take a list and go through it, which is what range returns, a list.
+A generator, on the other hand, doesn't create all the elements that will be asked for at once. It preserves its state and *generates* them one at a time, as their asked for.
+
+This is advantageous since it's super space-efficient! Let's look write our own version of `xrange` to get a feel for why that is.
+A generator has the same syntax as a function, however, we replace `return` with `yeild`. Whenever `yield` is reached, that value is returned, and the generator's state is preserved. 
+When the next item is asked for the generator picks up where it left off. So our version of `xrange` might look something like this:
+
+```python
+def generator_range(range_max):
+    i = 0
+    while i < range_max:
+        yield i
+        i += 1
+```
+
+This works as follows:
+1. `for i in generator_range(range_max)` is called, and the loop asks for the first element.
+2. `i` is set to 0, and when yield is reached, `i` is returned. 
+3. When the next item is asked for, the generator picks up again right after the last yield and increments `i`, then yields it again.
+4. This repeats until the function has no more items to yield, and then the loop exits. 
+
+
+What if the range is really big? Like 1,000,000? It is much more efficient to only store one variable and increment that variable up to 1,000,000 than it is to make a list of 1,000,000 variables!
+
+We can use IPython's %%timeit magic function to see this in action (though the real gains are in space, we save time with memory allocation).
+
+```
+In [9]: %%timeit
+for i in xrange(1000000):
+        a = i
+   ...:
+10 loops, best of 3: 30.1 ms per loop
+
+In [10]: %%timeit
+for i in range(1000000):
+        a = i
+   ....:
+10 loops, best of 3: 42.5 ms per loop
+```
+
+The built in function `list` can convert a generator into a list, if you really must...
+
+We can also create new generators from other generators! We use the same notation as list comprehension, with regular parentheses and a generator for the iterable.
+
+Remeber our list of squared numbers we were making before? Let's do it as a generator!
+
+```python
+squares = ( i**2 for i in xrange(1,101))
+```
+
+And now squares is a generator! Note since we didn't define it as a function, it's a one time use deal. Once we iterate over squares, there will be nothing left if we try and iterate again.
+
+###### Note
+File objects in Python are like generators! If we wanted to process a big file, we can do
+```python
+with open(FILENAME, 'r') as f:
+    for line in f:
+        ...
+```
+And this will only look at lines one at a time, remebering it's position each time, just like a generator! This makes searching a massive file very space efficient. 
+
+##### Challenges
+1. Write a generator that gives you all the numbers up to 100, squared, without using `xrange`. How about all the even numbers?
+2. Write a generator for the generates all prime numbers. 
+
+### 5. Decorators
+
+##### Note: In Python everything is an object
+It's probably worth noting here that in python, everything is an object, including functions!! Above when we saw `f = lambda x: x+2`, we were able to assign a variable to a function because functions are just objects, like any other variable! So below, when we define a function which takes another function as its argument, that's totally fine! As far as python is concerned, taking a function as an argument is the same as taking an integer as an argument. The same goes for returning a function from a function.  
+
+Let's illustrate this with an example.
+```python
+def func(x):
+    return x + 5
+
+def add_10(f):
+    def h(x):
+        return f(x) + 10
+    return h
+
+print func(20)  # prints 25
+g = add_10(func)
+print g(20)  #prints 35
+```
+
+Here we first made a function which takes an integer and adds 5.
+Next we made a function which takes a function as its argument,
+defines a new function, which adds 10 the result of its argument,
+then returns the new function. Just like `func` took an integer and returns an integer, `add_10` takes a function and returns a function. 
+
+__Now back to decorators!__
 
 A lot of the time, while programming, we find ourselves writing a whole load of similar functions. 
-Remember, pythonic code is all about beauty and simplicity, and part of that is not repeating yourself.
+Remember, pythonic code is all about beauty and simplicity, and part of that is not repeating yourself. ("Keeping it *D.R.Y.*" == Don't Repeat Yourself).
 Decorators are python's solution to many similar functions. 
 
 A decorator is a function which wraps another function. 
@@ -322,7 +473,7 @@ except:
 
 But you're repeating yourself! We're wrapping each function in a try/catch, so let's use a decorator to do that more easily.
 
-First we define a function which takes a function as it's argument and returns a new function which does not throw errors.
+First we define a function which takes a function as it's argument and returns a new function which does not throw errors. 
 
 ```python
 def noerrors(func): 
@@ -336,7 +487,7 @@ def noerrors(func):
 ```
 
 The `args` with an asterisk is simply a way of saying "As many arguments as you like", since we don't know that arguments `func` may take. 
-See [here](https://docs.python.org/2/tutorial/controlflow.html#arbitrary-argument-lists) for more. 
+See [here](https://docs.python.org/2/tutorial/controlflow.html#arbitrary-argument-lists) for more.
 
 We now want to apply this new function to our function. Let's make a function which raises an error just to see how it this might work.
 
@@ -475,66 +626,8 @@ function3() # Nothing happens
 3. Create a decorator which counts how many times a function is called and prints this count after each call.
 
 
-### 5. Generators
-
-There are two built in functions you may have encountered in your adventures with python without any immeditately noticible difference: `range` and `xrange`.
-The difference is that `range` returns an array, while xrange returns a generator. 
-
-What's a generator? 
-A generator is a function that behaves like an iterable. 
-Range simply returns a list, which is iterated over.
-A generator preserves its state, and returns the next element when it is asked for.
-
-This is advantageous since it's super space-efficient! Let's look write our own version of `xrange` to get a feel for why that is.
-A generator has the same syntax as a function, however, we replace `return` with `yeild`. Whenever `yield` is reached, that value is returned, and the generator's state is preserved. 
-When the next item is asked for the generator picks up where it left off. So our version of `xrange` might look something like this:
-
-```python
-def generator_range(range_max):
-    i = 0
-    while i < range_max:
-        yield i
-        i += 1
-```
-
-This works as follows:
-1. `for i in generator_range(range_max)` is called, and the loop asks for the first element.
-2. `i` is set to 0, and when yield is reached, `i` is returned. 
-3. When the next item is asked for, the generator picks up again right after the last yield and increments `i`, then yields it again.
-4. This repeats until the function has no more items to yield, and then the loop exits. 
 
 
-What if the range is really big? Like 1,000,000? It is much more efficient to only store one variable and increment that variable up to 1,000,000 than it is to make a list of 1,000,000 variables!
 
-We can use IPython's %%timeit magic function to see this in action (though the real gains are in space, we save time with memory allocation).
-
-```
-In [9]: %%timeit
-for i in xrange(1000000):
-        a = i
-   ...:
-10 loops, best of 3: 30.1 ms per loop
-
-In [10]: %%timeit
-for i in range(1000000):
-        a = i
-   ....:
-10 loops, best of 3: 42.5 ms per loop
-```
-
-The built in function `list` can convert a generator into a list, if you really must...
-
-We can also create new generators from other generators! We use the same notation as list comprehension, with regular parentheses and a generator for the iterable.
-
-Remeber our list of squared numbers we were making before? Let's do it as a generator!
-
-```python
-squares = ( i**2 for i in xrange(1,101))
-```
-
-And now squares is a generator! Note since we didn't define it as a function, it's a one time use deal. Once we iterate over squares, there will be nothing left if we try and iterate again.
-
-
-##### Challenges
-1. Write a generator that gives you all the numbers up to 100, squared, without using `xrange`. How about all the even numbers?
-2. Write a generator for the generates all prime numbers. 
+### I want more!
+Then check out [this](http://book.pythontips.com/en/latest/index.html) awesome online book! It covers everything seen today and more.

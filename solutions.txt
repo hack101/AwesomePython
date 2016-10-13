@@ -6,7 +6,7 @@
  [ x for sl in l for x in sl ] 
 1.4
  # thanks Usman for the improved solution!
- print '\n'.join(["Fizz"(i%3==0) + "Buzz"(i%5==0) or i for i in range(1,21)])
+ print '\n'.join([(i%3==0)*"Fizz" + (i%5==0)*"Buzz" or str(i) for i in range(1,21)])
 2.1
  words.sort(key=lambda x: x[2]) 
 2.2
@@ -20,35 +20,8 @@
 3.4
  reduce(lambda x, y: x if x > y else y, list)
 3.5
- reduce(lambda x,y: x if x<y else y, filter(lambda x: x!=reduce(lambda x,y: x if x<y else y, list), list))
+    reduce(lambda x, y: (min(x),y) if y < min(x) else x, nums, (float('inf'), float('inf')))
 4.1
- def paragraph(function):
-     def wrapper(*args):
-         return "<p>"+function(*args)+'</p>'
- 
-     return wrapper
-4.2
- class HTMLTag(object):
-     def __init__(self, tag):
-         assert type(tag) == str
-         self.tag = tag
- 
-     def __call__(self, func):
-         def wrapper(*args):
-             return '<{tag}>{string}</{tag}>'.format(tag=self.tag, string=func(*args))
-         return wrapper
-4.3
- class count(object):
-     def __init__(self):
-         self.count = 0
- 
-     def __call__(self, func):
-         def wrapper(*args):
-             self.count += 1
-             func(*args)
-             print "{name} called {count} times".format(name=func.__name__, count=self.count)
-         return wrapper
-5.1
  def squared():
      i=1
      while i < 100:
@@ -60,7 +33,7 @@
      while i < 100:
          yield i**2
          i+=2
-5.2
+4.2
  def is_prime(n):
      if n == 1:
          return True
@@ -77,3 +50,30 @@
              n+=1
              if is_prime(n):
                  break
+5.1
+ def paragraph(function):
+     def wrapper(*args):
+         return "<p>"+function(*args)+'</p>'
+ 
+     return wrapper
+5.2
+ class HTMLTag(object):
+     def __init__(self, tag):
+         assert type(tag) == str
+         self.tag = tag
+ 
+     def __call__(self, func):
+         def wrapper(*args):
+             return '<{tag}>{string}</{tag}>'.format(tag=self.tag, string=func(*args))
+         return wrapper
+5.3
+ class count(object):
+     def __init__(self):
+         self.count = 0
+ 
+     def __call__(self, func):
+         def wrapper(*args):
+             self.count += 1
+             func(*args)
+             print "{name} called {count} times".format(name=func.__name__, count=self.count)
+         return wrapper
